@@ -1,2 +1,2 @@
-# iPre_HRTF_Interpolation
-Generative Modeling  for HRTFs spatial interpolation using MIT's KEMAR dataset 
+# iPre HRTF Interpolation
+Generative Modeling for hrtf's KEMAR database space interpolation using DDSP 
