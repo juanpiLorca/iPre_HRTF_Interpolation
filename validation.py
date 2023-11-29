@@ -3,7 +3,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import utils as utl
 import core
-from Model3 import get_models
+from Model1 import get_models
 
 LATENT_SPACE = False
 
@@ -55,8 +55,8 @@ def pull_module(model,
 
 
 # Loss validation: --------------------------------------------------------------------------------------
-num1 = "2"
-num2 = "2_2"
+num1 = "0"
+num2 = "0_2"
 batch = 64
 loss1 = f"training data/losses per epoch/losses_cvae{num1}_on_batch{batch}_epochs{num_epochs}.npy"
 loss1 = np.load(loss1)
@@ -71,7 +71,7 @@ plot_losses(loss1=loss1,
 # Model validation: --------------------------------------------------------------------------------------
 # num1 ==> latent dim = 32
 # num2 ==> latent dim = 64 (BETTER PERFORMANCE)
-num = num1
+num = num2
 CVAE = get_models()
 weights = f"training data/weights/weights_cvae{num}_on_batch{batch}_epochs{num_epochs}.h5"
 CVAE.load_weights(weights)
@@ -88,7 +88,7 @@ hrir_right = hrir_right[:, tf.newaxis, :]
 spatial_info_path = "dataset/tags/radians_spherical.npy"
 spatial_info = np.load(spatial_info_path)
 spatial_info = core.tf_float32(spatial_info)
-spatial_info = tf.math.l2_normalize(spatial_info)
+#spatial_info = tf.math.l2_normalize(spatial_info)
 spatial_info = spatial_info[:, tf.newaxis, :]
 
 dataset = tf.concat([hrir_left, hrir_right], axis=1)
@@ -105,7 +105,7 @@ elev_azimuth = 2
 hrir_val = data_val[:, :, :-(num_coordinates + elev_azimuth)]
 spatial_info = data_val[:, 0, -(num_coordinates+elev_azimuth):]
 spatial_condition = core.tf_float32(spatial_info[:, :-elev_azimuth])
-spatial_condition = tf.math.l2_normalize(spatial_condition)
+#spatial_condition = tf.math.l2_normalize(spatial_condition)
 spatial_condition = tf.tile(spatial_condition[:, tf.newaxis, :], multiples=[1,2,1])
 _hrir_val_ = tf.concat([hrir_val, spatial_condition], axis=-1)
 

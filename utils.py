@@ -99,47 +99,54 @@ def plot2validate(x, x_hat, N=samples, fs=sample_rate):
 
 
 
-def plot2signals(x, x_hat, N=samples, fs=sample_rate): 
-    """
-    Plots two signals to compare.
-    """
+def plot2signals(x_hat1, x_hat2, N=samples, fs=sample_rate): 
     t = np.linspace(0, (N-1) / fs, N)
     f = np.linspace(0, (N-1) * fs / N, N)
 
-    X = np.fft.rfft(x)
-    X_mag = np.abs(X)
-    X_log = 20*np.log10(X_mag)
-    N_freq = X_mag.shape[0]
+    X_hat1 = np.fft.rfft(x_hat1)
+    X_hmag1 = np.abs(X_hat1)
+    X_hlog1 = 20*np.log10(X_hmag1)
+    phi1 = np.angle(X_hat1)
+    N_freq = X_hmag1.shape[0]
 
-    X_hat = np.fft.rfft(x_hat)
-    X_hmag = np.abs(X_hat)
-    X_hlog = 20*np.log10(X_hmag)
+    X_hat2 = np.fft.rfft(x_hat2)
+    X_hmag2 = np.abs(X_hat2)
+    X_hlog2 = 20*np.log10(X_hmag2)
+    phi2 = np.angle(X_hat2)
 
-    fig, axs = plt.subplots(nrows=2, ncols=2)
+    fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(9,6))
     # signal time domain:
-    axs[0, 0].plot(t, x)
-    axs[0, 0].set_title(f"Signal time domain")
+    axs[0, 0].plot(t, x_hat1)
     axs[0, 0].grid(True)
-    axs[0, 0].set_xlabel("time [s]")
+    axs[0, 0].set_xlabel("Time [s]")
     axs[0, 0].set_ylabel("x(t)")
     # Signal frequency domain:
-    axs[1, 0].plot(f[:N_freq], X_log)
-    axs[1, 0].set_title("Magnitude in dB") 
+    # Magnitude:
+    axs[1, 0].semilogx(f[:N_freq], X_hlog1)
     axs[1, 0].grid(True)
-    axs[1, 0].set_xlabel("frequency [Hz]")
+    axs[1, 0].set_xlabel("Frequency [Hz]")
     axs[1, 0].set_ylabel("|X(w)|dB")
+    # Phase:
+    axs[2, 0].semilogx(f[:N_freq], phi1)
+    axs[2, 0].grid(True)
+    axs[2, 0].set_xlabel("Frequency [Hz]")
+    axs[2, 0].set_ylabel("Phi(w)")
     # signal time domain:
-    axs[0, 1].plot(t, x_hat)
-    axs[0, 1].set_title(f"Signal time domain")
+    axs[0, 1].plot(t, x_hat2)
     axs[0, 1].grid(True)
-    axs[0, 1].set_xlabel("time [s]")
+    axs[0, 1].set_xlabel("Time [s]")
     axs[0, 1].set_ylabel("x(t)")
     # Signal frequency domain:
-    axs[1, 1].plot(f[:N_freq], X_hlog)
-    axs[1, 1].set_title("Magnitude in dB") 
+    # Magnitude:
+    axs[1, 1].semilogx(f[:N_freq], X_hlog2)
     axs[1, 1].grid(True)
-    axs[1, 1].set_xlabel("frequency [Hz]")
+    axs[1, 1].set_xlabel("Frequency [Hz]")
     axs[1, 1].set_ylabel("|X(w)|dB")
+    # Phase:
+    axs[2, 1].semilogx(f[:N_freq], phi2)
+    axs[2, 1].grid(True)
+    axs[2, 1].set_xlabel("Frequency [Hz]")
+    axs[2, 1].set_ylabel("Phi(w)")
     plt.tight_layout()
     plt.show()
 

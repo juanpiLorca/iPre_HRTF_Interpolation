@@ -44,7 +44,7 @@ num_filters = 128
 kernel_size = 4
 drates = (2, 4, 8, 16)
 # (CHANGE HERE TO TEST LATENT DIM 32 (num1) OR LATENT DIM 64 (num2))
-latent_dim = 32
+latent_dim = 64
 
 def encoder_layers(inputs, 
                    filters=num_filters, 
@@ -202,7 +202,7 @@ def decoder_layers(inputs_left,
 
 # 32 (latent dim)
 # (CHANGE HERE TO TEST LATENT DIM 35 (num1) OR LATENT DIM 67 (num2))
-INPUT_SHAPE_DECODER = (1, 35)
+INPUT_SHAPE_DECODER = (1, 67)
 # To fit adaptor's shape: 
 SPATIAL_SHAPE = (134, 3) 
 def decoder(input_shape=INPUT_SHAPE_DECODER, spatial_shape=SPATIAL_SHAPE): 

@@ -32,7 +32,6 @@ dataset = np.load(path_data)
 hrir_data = dataset[:, :, :-(num_coordinates+elev_azimuth)]
 spatial_info = dataset[:, :, -(num_coordinates+elev_azimuth):]
 spatial_info = spatial_info[:, :, :-elev_azimuth]
-spatial_info = tf.nn.l2_normalize(spatial_info)
 training_dataset = tf.concat([hrir_data, spatial_info], axis=-1)
 
 # Training:
