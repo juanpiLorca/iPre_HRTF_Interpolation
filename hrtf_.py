@@ -7,6 +7,7 @@ import utils
 def tsne_plotting(X, label, color, n_components=2):
     tsne = TSNE(n_components=n_components)
     X_tsne = tsne.fit_transform(X)
+    plt.grid()
     plt.scatter(x=X_tsne[:, 0], y=X_tsne[:, 1], c=color)
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
@@ -33,17 +34,17 @@ z = tags[:, 2]
 plot3D(x=x, y=y, z=z)
 
 # TSNE for the dataset: 
-# hrir_left = "dataset/hrirs/hrir_left.npy"
-# hrir_left = np.load(hrir_left)
-# hrir_right = "dataset/hrirs/hrir_right.npy"
-# hrir_right = np.load(hrir_right)
+hrir_left = "dataset/hrirs/hrir_left.npy"
+hrir_left = np.load(hrir_left)
+hrir_right = "dataset/hrirs/hrir_right.npy"
+hrir_right = np.load(hrir_right)
 
-# tsne_plotting(X=hrir_left, 
-#               label="HRIRs left", 
-#               color="blue")
-# tsne_plotting(X=hrir_right, 
-#               label="HRIRs right", 
-#               color="orange")
+tsne_plotting(X=hrir_left, 
+              label="HRIRs left", 
+              color="blue")
+tsne_plotting(X=hrir_right, 
+              label="HRIRs right", 
+              color="orange")
 
 # Plotting specific HRIR pair: 
 # sample rate: 

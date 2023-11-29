@@ -3,9 +3,13 @@ import tensorflow as tf
 import core
 import utils 
 
-from Model1 import get_models, Sampling
+from Model3 import get_models, Sampling
 
-num = "0_2"
+MODEL1 = False
+MODEL2 = False
+MODEL3 = True
+
+num = "2_2"
 batch = 64
 num_epochs = 500
 CVAE = get_models()
@@ -21,6 +25,8 @@ def pull_module(model,
     return module
 
 encoder = pull_module(model=CVAE)
+decoder = pull_module(model=CVAE, 
+                      module_name="decoder_model")
 
 # Data generation: ------------------------------------------------------------------------
 phi = 65
@@ -66,13 +72,40 @@ z = tf.concat([z1, z2], axis=0)
 # utils.tsne_plotting(z_left=z[:, 0, :], 
 #                     z_right=z[:, 1, :])
 
-h_gen_left1, h_gen_right1 = CVAE(x1)
-utils.plot2signals(x_hat1=h_gen_left1[0], 
-                   x_hat2=h_gen_right1[0])
+# h_gen_left1, h_gen_right1 = CVAE(x1)
+# utils.plot2signals(x_hat1=h_gen_left1[0], 
+#                    x_hat2=h_gen_right1[0])
 
 # h_gen_left2, h_gen_right2 = CVAE(x2)
 # utils.plot2signals(x_hat1=h_gen_left2[0], 
 #                    x_hat2=h_gen_right2[0])
+
+# Data generation using white noise: ---------------------------------------------------
+# latent dim: 64
+
+if MODEL1 or MODEL2:
+    N = 64
+    z_left = core.tf_float32(np.random.normal(0, 1, 64))[tf.newaxis, tf.newaxis, :]
+    z_right = core.tf_float32(np.random.normal(0, 1, 64))[tf.newaxis, tf.newaxis, :]
+    p_s = p_s[tf.newaxis, tf.newaxis, :]
+
+    h_gen_left, h_gen_right = decoder([z_left, z_right, p_s])
+    utils.plot2signals(x_hat1=h_gen_left[0], 
+                    x_hat2=h_gen_right[0])
+    
+if MODEL3: 
+    N = 64
+    z_left = core.tf_float32(np.random.normal(0, 1, 64))
+    z_left = tf.concat([z_left, p_s], axis=-1)[tf.newaxis, tf.newaxis, :]
+    z_right = core.tf_float32(np.random.normal(0, 1, 64))
+    z_right = tf.concat([z_right, p_s], axis=-1)[tf.newaxis, tf.newaxis, :]
+    c_2dim = 134
+    p_s = tf.tile(p_s[tf.newaxis, tf.newaxis, :], multiples=[1,c_2dim,1])
+
+    h_gen_left, h_gen_right = decoder([z_left, z_right, p_s])
+    utils.plot2signals(x_hat1=h_gen_left[0], 
+                    x_hat2=h_gen_right[0])
+
 
 
 
