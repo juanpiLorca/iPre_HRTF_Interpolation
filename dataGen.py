@@ -3,13 +3,13 @@ import tensorflow as tf
 import core
 import utils 
 
-from Model3 import get_models, Sampling
+from Model1 import get_models, Sampling
 
-MODEL1 = False
+MODEL1 = True
 MODEL2 = False
-MODEL3 = True
+MODEL3 = False
 
-num = "2_2"
+num = "0_2"
 batch = 64
 num_epochs = 500
 CVAE = get_models()
