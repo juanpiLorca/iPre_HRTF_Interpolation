@@ -23,31 +23,25 @@ def plot_signal(x, N=samples, fs=sample_rate):
     N_freq = X_mag.shape[0]
     phi = np.angle(X)
 
-    fig, axs = plt.subplots(nrows=2, ncols=2)
-    # signal time domain:
-    axs[0, 0].plot(t, x)
-    axs[0, 0].set_title(f"Signal time domain")
-    axs[0, 0].grid(True)
-    axs[0, 0].set_xlabel("time [s]")
-    axs[0, 0].set_ylabel("x(t)")
-    # Signal frequency domain:
-    axs[1, 0].plot(f[:N_freq], X_mag)
-    axs[1, 0].set_title(f"Signal frequency domain") 
-    axs[1, 0].grid(True)
-    axs[1, 0].set_xlabel("frequency [Hz]")
-    axs[1, 0].set_ylabel("|X(w)|")
-    # Logarithmic Scale: Magnitude 
-    axs[0, 1].semilogx(f[:N_freq], X_log)
-    axs[0, 1].set_title(f"Magnitude in dB")
-    axs[0, 1].grid(True)
-    axs[0, 1].set_xlabel("frequency [Hz]")
-    axs[0, 1].set_ylabel("|X(w)|dB")
-    # Logarithmic Scale: Phase
-    axs[1, 1].semilogx(f[:N_freq], phi)
-    axs[1, 1].set_title(f"Phase in log-scale")
-    axs[1, 1].grid(True)
-    axs[1, 1].set_xlabel("frequency [Hz]")
-    axs[1, 1].set_ylabel("Phi(w)")
+    fig, axs = plt.subplots(nrows=3, figsize=(9,6))
+    # Subplot 1: Time domain
+    axs[0].plot(t, x)
+    axs[0].grid(True)
+    axs[0].set_xlabel("Time [s]")
+    axs[0].set_ylabel("x(n)")
+
+    # Subplot 2: Logarithmic Scale - Magnitude
+    axs[1].semilogx(f[:N_freq], X_log)
+    axs[1].grid(True)
+    axs[1].set_xlabel("Frequency [Hz]")
+    axs[1].set_ylabel("|X(w)|dB")
+
+    # Subplot 3: Logarithmic Scale - Phase
+    axs[2].semilogx(f[:N_freq], phi)
+    axs[2].grid(True)
+    axs[2].set_xlabel("Frequency [Hz]")
+    axs[2].set_ylabel("Phi(w)")
+
     plt.tight_layout()
     plt.show()
     
@@ -114,7 +108,7 @@ def plot2signals(x_hat1, x_hat2, N=samples, fs=sample_rate):
     X_hlog2 = 20*np.log10(X_hmag2)
     phi2 = np.angle(X_hat2)
 
-    fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(9,6))
+    fig, axs = plt.subplots(nrows=3, ncols=2, figsize=(15,10))
     # signal time domain:
     axs[0, 0].plot(t, x_hat1)
     axs[0, 0].grid(True)

@@ -6,9 +6,9 @@ from tqdm import tqdm
 from losses import SpectralLoss
 from metrics import LSDMetric
 
-from Model3 import get_models
+from Model1 import get_models
 
-NUM_TRAINING = "2"
+NUM_TRAINING = "0_full"
 
 # Metrics utils: ------------------------------------------------------------------------------------
 def plot_metrics(train_losses, losses_name, train_metric_l, l_metric_name, train_metric_r, 
@@ -27,8 +27,9 @@ BATCH_SIZE = 64
 num_coordinates = 3
 elev_azimuth = 2
 
-path_data = "dataset/shuffle to train/training_spherical_data.npy"
+path_data = "dataset/shuffle to train/training_data_cartesian_full.npy"
 dataset = np.load(path_data)
+print(dataset.shape)
 hrir_data = dataset[:, :, :-(num_coordinates+elev_azimuth)]
 spatial_info = dataset[:, :, -(num_coordinates+elev_azimuth):]
 spatial_info = spatial_info[:, :, :-elev_azimuth]
