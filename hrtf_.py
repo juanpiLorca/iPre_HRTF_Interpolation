@@ -1,81 +1,138 @@
 import numpy as np 
 import matplotlib.pyplot as plt 
-from sklearn.manifold import TSNE
+import utils 
+import core
+import scipy.fft as fft
 
-import utils
+# Data augmentation: 
+# Add delays: {90°, 180°}
+# Add color noise: white and pink 
 
-def tsne_plotting(X, label, color, n_components=2):
-    tsne = TSNE(n_components=n_components)
-    X_tsne = tsne.fit_transform(X)
-    plt.grid()
-    plt.scatter(x=X_tsne[:, 0], y=X_tsne[:, 1], c=color)
-    plt.xlabel('X-axis')
-    plt.ylabel('Y-axis')
-    plt.title(f't-SNE KEMAR dataset: {label}')
-    plt.show()
-
-
-def plot3D(x, y, z): 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(x, y, z, c="blue")
-    ax.set_xlabel('x-axis')
-    ax.set_ylabel('y-axis')
-    ax.set_zlabel('z-axis')
-    ax.set_title('MIT anechoic chamber')
-    plt.show()
-
-# Plotting coordinates: 
-tags = "dataset/tags/cartesian_coordinates.npy"
-tags = np.load(tags)
-x = tags[:, 0]
-y = tags[:, 1]
-z = tags[:, 2]
-plot3D(x=x, y=y, z=z)
-
-# TSNE for the dataset: 
+# Source elevation order: -10°, ..., -40°, 0°, 10°, ..., 90°
 hrir_left = "dataset/hrirs/hrir_left.npy"
 hrir_left = np.load(hrir_left)
 hrir_right = "dataset/hrirs/hrir_right.npy"
 hrir_right = np.load(hrir_right)
 
-tsne_plotting(X=hrir_left, 
-              label="HRIRs left", 
-              color="blue")
-tsne_plotting(X=hrir_right, 
-              label="HRIRs right", 
-              color="orange")
+"""
+The main idea here is to augment each elevation data by a combination of delays and 
+noise superposition. 
+"""
 
-# Plotting specific HRIR pair: 
+def pink_noise(N, d=0.5): 
+    X_white = np.fft.rfft(np.random.randn(N))
+    S = np.fft.rfftfreq(N)
+    S_pink = np.zeros_like(S)
+    for i in range(0, len(S)):
+        f = S[i]
+        S_pink[i] = 1/np.where(f == 0, float('inf'), f**d)
+    S_pink = S_pink / np.sqrt(np.mean(S**2))
+    X_shaped = X_white * S_pink
+    noise = np.fft.irfft(X_shaped)
+    noise = (np.max(noise) - noise) / (np.max(noise) - np.min(noise))
+    return noise
+
 # sample rate: 
 fs = 44100
 # samples: 
 N = 512
 t = np.linspace(0,N/fs,N)
+print(t[-1])
 
-phi = 90
-theta = 0
-h_left, h_right = utils.extract_hrir(elev=phi, 
-                                     azimuth=theta)
+# Noise: 
+# white: 
+mu = 0.0
+sigma = 1.0
+noise = np.random.normal(loc=mu, scale=np.sqrt(sigma), size=N)
+pnoise = pink_noise(N=N)
+SNR = 40 # [dB]
 
-# fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(8,4))
-# axs[0].plot(t, h_left)
-# axs[0].set_title("HRIR left (90°, 0°)")
-# axs[0].set_xlabel("Time [s]")
-# axs[0].set_ylabel("Amplitude")
-# axs[0].grid()
-# axs[1].plot(t, h_right)
-# axs[1].set_title("HRIR right (90°, 0°)")
-# axs[1].set_xlabel("Time [s]")
-# axs[1].set_ylabel("Amplitude")
-# axs[1].grid()
-# plt.tight_layout()
-# plt.show()
+# By clipping both noises to [-1,1], and using noise amplitude as 0.000625 we get a SNR = 40.9
 
-# fig = plt.figure(figsize=(9,4))
-# plt.plot(t, h_right)
-# plt.xlabel("Time [s]")
-# plt.ylabel("Amplitude")
-# plt.grid()
-# plt.show()
+def zero_pad(signal, length=1024):
+    pad_length = length - signal.shape[0]
+    zeros = np.zeros(shape=(pad_length,))
+    x_padded = np.concatenate([signal, zeros], axis=-1)
+    return x_padded
+
+def delay(signal, 
+          delay_secs, 
+          sample_rate=44100,
+          samples=1024): 
+    delay_samples = round(delay_secs * sample_rate)
+    delay_fir = np.zeros(shape=(delay_samples,))
+    delay_fir[-1] = 1
+    delay_signal = np.convolve(signal, delay_fir)
+
+    if delay_signal.shape[0] <= samples: 
+        delay_signal = zero_pad(delay_signal)
+
+    return delay_signal
+
+DELAY_SECS90 = N / fs * 0.25 
+DELAY_SECS180 = N / fs * 0.5
+DELAY_SECS270 = N /fs * 0.75
+DELAY_SECS360 = N / fs * 1.0
+FINAL_SAMPLES = 1024
+
+
+def data_upsample(): 
+    hrir_left1024 = []
+    for hLeft in hrir_left: 
+        hLeft = zero_pad(hLeft)
+        hrir_left1024.append(hLeft)
+
+    hrir_left1024 = np.array(hrir_left1024)
+    print(f"Zero padded dataset shape: {hrir_left1024.shape}")
+    filename = "dataset/hrirs/hrir_left_1024.npy"
+    np.save(filename, hrir_left1024)
+
+    hrir_right1024 = []
+    for hRight in hrir_right: 
+        hRight = zero_pad(hRight)
+        hrir_right1024.append(hRight)
+
+    hrir_right1024 = np.array(hrir_right1024)
+    print(f"Zero padded dataset shape: {hrir_right1024.shape}")
+    filename = "dataset/hrirs/hrir_right_1024.npy"
+    np.save(filename, hrir_right1024)
+
+def data_delay(delay_secs, delay_deg): 
+    hrir_left1024 = []
+    for hLeft in hrir_left: 
+        hLeft = delay(hLeft, delay_secs)
+        hrir_left1024.append(hLeft)
+
+    hrir_left1024 = np.array(hrir_left1024)
+    print(f"Zero padded dataset shape: {hrir_left1024.shape}")
+    filename = f"dataset/hrirs/hrir_left_delay_{delay_deg}_1024.npy"
+    np.save(filename, hrir_left1024)
+
+    hrir_right1024 = []
+    for hRight in hrir_right: 
+        hRight = delay(hRight, delay_secs)
+        hrir_right1024.append(hRight)
+
+    hrir_right1024 = np.array(hrir_right1024)
+    print(f"Zero padded dataset shape: {hrir_right1024.shape}")
+    filename = f"dataset/hrirs/hrir_right_delay_{delay_deg}_1024.npy"
+    np.save(filename, hrir_right1024)
+
+data_delay(delay_secs=DELAY_SECS90, delay_deg="90")
+
+data_delay(delay_secs=DELAY_SECS180, delay_deg="180")
+
+data_delay(delay_secs=DELAY_SECS270, delay_deg="270")
+
+data_delay(delay_secs=DELAY_SECS360, delay_deg="360")
+    
+
+
+
+
+
+
+
+
+
 

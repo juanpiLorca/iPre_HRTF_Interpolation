@@ -197,6 +197,17 @@ def tsne_plotting(z_left, z_right, n_components=2):
     plt.tight_layout()
     plt.show()
 
+# Sphere scatter plot: 
+def plot3D(x, y, z): 
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(x, y, z, c="blue")
+    ax.set_xlabel('x-axis')
+    ax.set_ylabel('y-axis')
+    ax.set_zlabel('z-axis')
+    ax.set_title('MIT anechoic chamber')
+    plt.show()
+
 
 # Spatial Audio: ---------------------------------------------------------------------------------------------------------------------
 def audio3D(x_left, x_right, filename, fs=sample_rate): 
