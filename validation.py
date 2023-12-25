@@ -3,7 +3,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import utils as utl
 import core
-from Model1 import get_models
+from Model import get_models
 
 LATENT_SPACE = False
 

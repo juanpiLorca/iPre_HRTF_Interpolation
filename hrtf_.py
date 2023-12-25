@@ -97,34 +97,58 @@ def data_upsample():
     filename = "dataset/hrirs/hrir_right_1024.npy"
     np.save(filename, hrir_right1024)
 
-def data_delay(delay_secs, delay_deg): 
+def data_delay(delay_secs, 
+               delay_deg, 
+               noise=True, 
+               amplitude=0.000625): 
     hrir_left1024 = []
     for hLeft in hrir_left: 
         hLeft = delay(hLeft, delay_secs)
+        if noise:
+            hLeft += amplitude * np.clip(np.random.normal(size=hLeft.shape[0]), -1 , 1)
         hrir_left1024.append(hLeft)
 
     hrir_left1024 = np.array(hrir_left1024)
     print(f"Zero padded dataset shape: {hrir_left1024.shape}")
     filename = f"dataset/hrirs/hrir_left_delay_{delay_deg}_1024.npy"
+    if noise: 
+        filename = f"dataset/hrirs/hrir_left_noisy_delay_{delay_deg}_1024.npy"
     np.save(filename, hrir_left1024)
 
     hrir_right1024 = []
     for hRight in hrir_right: 
         hRight = delay(hRight, delay_secs)
+        if noise:
+            hRight += amplitude * np.clip(np.random.normal(size=hRight.shape[0]), -1 , 1)
         hrir_right1024.append(hRight)
 
     hrir_right1024 = np.array(hrir_right1024)
     print(f"Zero padded dataset shape: {hrir_right1024.shape}")
     filename = f"dataset/hrirs/hrir_right_delay_{delay_deg}_1024.npy"
+    if noise: 
+        filename = f"dataset/hrirs/hrir_right_noisy_delay_{delay_deg}_1024.npy"
     np.save(filename, hrir_right1024)
 
-data_delay(delay_secs=DELAY_SECS90, delay_deg="90")
+# data_delay(delay_secs=DELAY_SECS90, delay_deg="90")
 
-data_delay(delay_secs=DELAY_SECS180, delay_deg="180")
+# data_delay(delay_secs=DELAY_SECS180, delay_deg="180")
 
-data_delay(delay_secs=DELAY_SECS270, delay_deg="270")
+# data_delay(delay_secs=DELAY_SECS270, delay_deg="270")
 
-data_delay(delay_secs=DELAY_SECS360, delay_deg="360")
+# data_delay(delay_secs=DELAY_SECS360, delay_deg="360")
+    
+
+hrir_left1 = "dataset/hrirs/hrir_left_1024.npy"
+hrir_left1 = np.load(hrir_left1)
+hrir_left1 = hrir_left1[0]
+
+hrir_left2 = "dataset/hrirs/hrir_left_delay_360_1024.npy"
+hrir_left2 = np.load(hrir_left2)
+hrir_left2 = hrir_left2[0]
+
+plt.plot(hrir_left1)
+plt.plot(hrir_left2)
+plt.show()
     
 
 

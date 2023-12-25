@@ -6,7 +6,7 @@ from tqdm import tqdm
 from losses import SpectralLoss
 from metrics import LSDMetric
 
-from Model1 import get_models
+from Model import get_models
 
 NUM_TRAINING = "0_full"
 

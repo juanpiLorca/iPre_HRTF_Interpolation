@@ -3,7 +3,7 @@ import tensorflow as tf
 import core
 import utils 
 import matplotlib.pyplot as plt 
-from Model1 import get_models, Sampling
+from Model import get_models, Sampling
 
 num = "0_full"
 batch = 64

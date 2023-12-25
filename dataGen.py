@@ -3,11 +3,11 @@ import tensorflow as tf
 import core
 import utils 
 
-from Model3 import get_models, Sampling
+from Model import get_models, Sampling
 
 MODEL1 = False
-MODEL2 = False
-MODEL3 = True
+MODEL2 = True
+MODEL3 = False
 
 num = "2_2"
 batch = 64
