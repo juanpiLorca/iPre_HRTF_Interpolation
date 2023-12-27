@@ -136,20 +136,36 @@ def data_delay(delay_secs,
 # data_delay(delay_secs=DELAY_SECS270, delay_deg="270")
 
 # data_delay(delay_secs=DELAY_SECS360, delay_deg="360")
-    
 
-hrir_left1 = "dataset/hrirs/hrir_left_1024.npy"
-hrir_left1 = np.load(hrir_left1)
-hrir_left1 = hrir_left1[0]
 
-hrir_left2 = "dataset/hrirs/hrir_left_delay_360_1024.npy"
-hrir_left2 = np.load(hrir_left2)
-hrir_left2 = hrir_left2[0]
+add_ons_left = ["left_1024", "left_delay_90_1024", "left_delay_180_1024", 
+           "left_delay_270_1024", "left_delay_360_1024", "left_noisy_delay_90_1024",
+           "left_noisy_delay_180_1024", "left_noisy_delay_270_1024", "left_noisy_delay_360_1024"]
+add_ons_right = ["right_1024", "left_delay_90_1024", "right_delay_180_1024", 
+           "right_delay_270_1024", "right_delay_360_1024", "right_noisy_delay_90_1024",
+           "right_noisy_delay_180_1024", "right_noisy_delay_270_1024", "right_noisy_delay_360_1024"]
 
-plt.plot(hrir_left1)
-plt.plot(hrir_left2)
-plt.show()
-    
+coordinates_path = "dataset/tags/cartesian_coordinates.npy"
+coord = np.load(coordinates_path)
+full_data = []
+coordinates = []
+i = 0 
+for add_on in add_ons_right:
+    hrir_path = f"dataset/hrirs/hrir_{add_on}.npy"
+    hrir_dataset = np.load(hrir_path)
+    if i == 0: 
+        full_data = hrir_dataset
+        coordinates = coord
+    else: 
+        full_data = np.concatenate([full_data, hrir_dataset], axis=0)
+        coordinates = np.concatenate([coordinates, coord], axis=0)
+    i += 1
+
+np.save("cartesian_coordinates_augmented.npy", coordinates)
+np.save("dataset/data_augmented__hrir_right.npy", full_data)
+
+
+
 
 
 
